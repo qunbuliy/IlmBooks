@@ -1,0 +1,140 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account profile for customer, publisher or administrator",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "Email address" },
+        "displayName": { "type": "string", "maxLength": 100, "description": "Full name" },
+        "role": { "type": "string", "enum": ["customer", "publisher", "admin"], "description": "Account role" },
+        "phone": { "type": "string", "maxLength": 20, "description": "Phone number" },
+        "state": { "type": "string", "maxLength": 50, "description": "State in Nigeria" },
+        "address": { "type": "string", "maxLength": 255, "description": "Street address" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Publisher": {
+      "title": "Publisher",
+      "description": "Registered publisher or author profile awaiting or granted approval",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Publisher ID" },
+        "userId": { "type": "string", "description": "Linked User UID" },
+        "businessName": { "type": "string", "maxLength": 120, "description": "Registered publisher or imprint name" },
+        "contactPerson": { "type": "string", "maxLength": 100, "description": "Primary contact name" },
+        "email": { "type": "string", "format": "email", "description": "Official email" },
+        "phone": { "type": "string", "maxLength": 20, "description": "Contact telephone or WhatsApp" },
+        "state": { "type": "string", "maxLength": 50, "description": "State of operation" },
+        "bio": { "type": "string", "maxLength": 1000, "description": "Brief biography or catalogue focus" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "description": "Verification status" },
+        "commissionRate": { "type": "number", "description": "Marketplace platform commission percentage e.g. 15" },
+        "bankName": { "type": "string", "maxLength": 100, "description": "Settlement bank name" },
+        "accountNumber": { "type": "string", "maxLength": 20, "description": "NUBAN account number" },
+        "accountName": { "type": "string", "maxLength": 100, "description": "Account holder name" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "userId", "businessName", "email", "status"]
+    },
+    "Book": {
+      "title": "Book",
+      "description": "Arabic or Islamic publication listed in the marketplace",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique book identifier" },
+        "titleEn": { "type": "string", "maxLength": 200, "description": "Title in English/Latin" },
+        "titleAr": { "type": "string", "maxLength": 200, "description": "Title in Arabic script" },
+        "author": { "type": "string", "maxLength": 150, "description": "Author or compiler name" },
+        "publisherId": { "type": "string", "description": "Publisher ID" },
+        "publisherName": { "type": "string", "maxLength": 120, "description": "Publisher or imprint name" },
+        "isbn": { "type": "string", "maxLength": 30, "description": "ISBN if available" },
+        "category": { "type": "string", "description": "Book category identifier" },
+        "language": { "type": "string", "enum": ["Arabic", "English", "Yoruba", "Bilingual AR/EN", "Bilingual AR/YO"], "description": "Language" },
+        "format": { "type": "string", "enum": ["paperback", "hardcover", "digital"], "description": "Physical binding or digital e-book" },
+        "price": { "type": "number", "description": "Price in Nigerian Naira (NGN)" },
+        "originalPrice": { "type": "number", "description": "Original strike-through price if discounted" },
+        "stock": { "type": "number", "description": "Units available in stock" },
+        "isFeatured": { "type": "boolean", "description": "Whether featured on homepage" },
+        "isBestSeller": { "type": "boolean", "description": "Whether marked as best seller" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"], "description": "Publishing status" },
+        "description": { "type": "string", "maxLength": 3000, "description": "Synopsis and details" },
+        "coverUrl": { "type": "string", "description": "Cover image URL" },
+        "digitalFileUrl": { "type": "string", "description": "Secure file path or URL for digital editions" },
+        "pages": { "type": "number", "description": "Page count" },
+        "publicationYear": { "type": "number", "description": "Year of publication" },
+        "tags": { "type": "string", "description": "Comma-separated search tags" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["id", "titleEn", "author", "category", "language", "format", "price", "stock", "status"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase transaction record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Order reference ID" },
+        "customerId": { "type": "string", "description": "User ID of purchaser" },
+        "customerName": { "type": "string", "maxLength": 100, "description": "Recipient full name" },
+        "customerEmail": { "type": "string", "format": "email", "description": "Email address" },
+        "customerPhone": { "type": "string", "maxLength": 20, "description": "Contact telephone" },
+        "deliveryState": { "type": "string", "maxLength": 50, "description": "Destination state" },
+        "deliveryAddress": { "type": "string", "maxLength": 300, "description": "Delivery address" },
+        "subtotal": { "type": "number", "description": "Subtotal in NGN" },
+        "shippingFee": { "type": "number", "description": "Shipping fee in NGN" },
+        "total": { "type": "number", "description": "Grand total in NGN" },
+        "paymentMethod": { "type": "string", "enum": ["paystack", "cod", "whatsapp"], "description": "Chosen payment route" },
+        "paymentStatus": { "type": "string", "enum": ["pending", "paid", "failed"], "description": "Payment verification state" },
+        "orderStatus": { "type": "string", "enum": ["pending", "processing", "shipped", "delivered", "cancelled"], "description": "Fulfillment status" },
+        "paystackReference": { "type": "string", "description": "Paystack transaction reference" },
+        "createdAt": { "type": "string", "description": "Order placement timestamp" }
+      },
+      "required": ["id", "customerId", "customerEmail", "total", "paymentMethod", "orderStatus"]
+    },
+    "BulkOrderEnquiry": {
+      "title": "BulkOrderEnquiry",
+      "description": "School and institutional bulk quotation request",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Enquiry reference number" },
+        "schoolName": { "type": "string", "maxLength": 150, "description": "School or Islamic institute name" },
+        "contactPerson": { "type": "string", "maxLength": 100, "description": "Administrator / Headmaster name" },
+        "email": { "type": "string", "format": "email", "description": "Contact email" },
+        "phone": { "type": "string", "maxLength": 20, "description": "Contact telephone or WhatsApp" },
+        "state": { "type": "string", "maxLength": 50, "description": "Location state" },
+        "address": { "type": "string", "maxLength": 255, "description": "School premises address" },
+        "curriculumLevel": { "type": "string", "description": "Primary / Secondary / I'dadi / Thanawi" },
+        "requiredSubjects": { "type": "string", "maxLength": 500, "description": "Target textbook subjects" },
+        "estimatedQuantity": { "type": "number", "description": "Estimated student copies" },
+        "notes": { "type": "string", "maxLength": 1000, "description": "Additional requirements" },
+        "status": { "type": "string", "enum": ["pending", "quoted", "fulfilled", "cancelled"], "description": "Status" },
+        "quotedAmount": { "type": "number", "description": "Official quote prepared by admin" },
+        "createdAt": { "type": "string", "description": "Submission timestamp" }
+      },
+      "required": ["id", "schoolName", "contactPerson", "email", "phone", "state", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile documents"
+    },
+    "/publishers/{publisherId}": {
+      "schema": { "$ref": "#/entities/Publisher" },
+      "description": "Publisher partner directory and application listings"
+    },
+    "/books/{bookId}": {
+      "schema": { "$ref": "#/entities/Book" },
+      "description": "Books in the catalog"
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer order records"
+    },
+    "/bulkOrders/{bulkOrderId}": {
+      "schema": { "$ref": "#/entities/BulkOrderEnquiry" },
+      "description": "School and institutional bulk quotation enquiries"
+    }
+  }
+}

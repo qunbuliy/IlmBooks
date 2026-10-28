@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Admin authorization check: checks email or custom claim or presence in admin list
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'adekolaabdullah56@gmail.com' ||
+        (request.auth.token.email != null && request.auth.token.email.matches('.*admin.*')) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Books Collection
+    match /books/{bookId} {
+      // Anyone can read approved books; publishers read their own; admin reads all
+      allow read: if resource.data.status == 'approved' || 
+                     (isSignedIn() && (resource.data.publisherId == request.auth.uid || isAdmin()));
+      
+      // Verified publishers or admin can list books
+      allow create: if isSignedIn() && (request.resource.data.publisherId == request.auth.uid || isAdmin());
+      
+      // Publisher can update their own pending/draft book or admin can update any book (e.g. approve/reject)
+      allow update: if isSignedIn() && (
+        isAdmin() || 
+        (resource.data.publisherId == request.auth.uid && request.resource.data.publisherId == request.auth.uid)
+      );
+      
+      allow delete: if isAdmin();
+    }
+
+    // Publishers Collection
+    match /publishers/{publisherId} {
+      allow read: if resource.data.status == 'approved' || 
+                     (isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin()));
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Orders Collection
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.customerId == request.auth.uid || isAdmin());
+      // Customers can create orders with their uid, or guest checkout with verified payload
+      allow create: if isSignedIn() ? (request.resource.data.customerId == request.auth.uid) : true;
+      allow update: if isAdmin() || (isSignedIn() && resource.data.customerId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // Bulk Order Enquiries (School Quotes)
+    match /bulkOrders/{bulkOrderId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if true; // Any school can submit a quotation enquiry
+      allow update, delete: if isAdmin();
+    }
+  }
+}

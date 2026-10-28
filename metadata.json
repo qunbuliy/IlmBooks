@@ -1,0 +1,6 @@
+{
+  "name": "IlmBooks - Arabic & Islamic Publishing Marketplace",
+  "description": "Premier Arabic and Islamic publishing marketplace and school textbook platform serving Nigeria and West Africa with physical and digital books, publisher approvals, and bulk school orders.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
